@@ -12,27 +12,36 @@ library("dplyr")
 biopsy <- read.csv("biopsy.csv")
 
 # Set human-readable names
-names(biopsy) <- c("Number", "ID", "Thickness", "SizeUniformity", "ShapeUniformity", "Adhesion", "CellSize", "Nuclei", "Chromatin", "Nucleoli", "Mitoses", "Verdict")
+biopsy <- biopsy[,-1]
+
+names(biopsy) <- c("ID", "Thickness", "SizeUniformity", "ShapeUniformity", "Adhesion", "CellSize", "Nuclei", "Chromatin", "Nucleoli", "Mitoses", "Verdict")
+biopsy$Verdict[biopsy$Verdict == "benign"] <- 0
+biopsy$Verdict[biopsy$Verdict == "malignant"] <- 1
+biopsy$Verdict <- as.numeric(biopsy$Verdict)
+biopsy=drop_na(biopsy)
+
+
+
 
 # Exploratory plots
-plot(biopsy[,3:11])
+plot(biopsy[,2:10])
 
 # Predictor correlation analysis
 attach(biopsy)
 test1 <- cor.test(SizeUniformity, ShapeUniformity)
 test1$p.value
 
-corrs <- rcorr(as.matrix(biopsy[,3:11]))
+corrs <- rcorr(as.matrix(biopsy[,2:10]))
 corrs
 corrplot(corrs$r, order="hclust", tl.col="firebrick2", tl.srt = 45)
 
-# Set response variable to binary
-biopsy$Verdict <- ifelse(biopsy$Verdict=="benign", 0, 1)
+plot(jitter(biopsy$Thickness), jitter(biopsy$Verdict), col=c('#8eca74', '#ffc23f')[as.factor(biopsy$Verdict)], main="Thickness vs. Verdict", xlab="Thickness", ylab="Verdict", pch=1)
+legend("topleft", legend=c("benign", "malignant"),
+       col=c("#8eca74", "#ffc23f"), pch=1, cex=0.8)
 
-# Exploratory plot for thickness
-plot(jitter(Thickness), jitter(biopsy$Verdict), col="chartreuse3", main="Thickness vs. Verdict", xlab="Thickness", ylab="Verdict")
 
-# Model for thickness as a sample
+
+
 model.thickness <- glm(Verdict~Thickness, data=biopsy, family=binomial(link="logit"))
 summary(model.thickness)
 plot(model.thickness)
@@ -47,6 +56,7 @@ make.model.1 <- function(resp, pred) {
   return (model)
 }
 
+
 # Testing the function
 model.sunif <- make.model.1(biopsy$Verdict, biopsy$SizeUniformity)
 summary(model.sunif)
@@ -54,8 +64,27 @@ model.sunif$null.deviance - model.sunif$deviance
 
 deltas <- data.frame("template", 0)
 names(deltas) <- c("predictor", "delta")
-for(pred in names(biopsy)[3:7]){
+for(pred in names(biopsy)[2:6]){
   model <- make.model.1(biopsy$Verdict, pred)
   delta <- model$null.deviance - model$deviance
   deltas %>% add_row(predictor = pred, delta = delta)
 }
+
+
+# Manual build up
+model1 = glm(Verdict~Thickness,family="binomial",data=biopsy)
+summary(model1)
+model2 = glm(Verdict~Thickness+SizeUniformity,family="binomial",data=biopsy)
+summary(model2)
+model3 = glm(Verdict~Thickness+SizeUniformity+ShapeUniformity,family="binomial",data=biopsy)
+summary(model3)
+model4 = glm(Verdict~Thickness+SizeUniformity*ShapeUniformity,family="binomial",data=biopsy)
+summary(model4)
+model5 = glm(Verdict~.,family="binomial",data=biopsy)
+summary(model5)
+
+coef(model5)
+
+list(model1, model2, model3, model4, model5)
+anova(model1, model2, model3, model4, model5, test = "Chisq")
+# By now, model4 is the best based on deviance as it has the lowest compared to the other models.
