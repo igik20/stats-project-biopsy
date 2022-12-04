@@ -88,10 +88,65 @@ summary(model.chromatin) # ResDev 388.2
 model.nucleoli <- glm(Verdict~Nucleoli, family="binomial", data=biopsy)
 summary(model.nucleoli) # ResDev 464.3
 model.mitoses <- glm(Verdict~Mitoses, family="binomial", data=biopsy)
-summary(model.mitoses) # ResDev 717.52
+summary(model.mitoses) # ResDev 717.5
 
-single.models <- data.frame(pred=names(biopsy)[2:10],resdev=c(458.5, 254.8, 267.6, 463.3, 452.9, 340.6, 388.2, 464.3, 717.52))
+single.models <- data.frame(pred=names(biopsy)[2:10],resdev=c(458.5, 254.8, 267.6, 463.3, 452.9, 340.6, 388.2, 464.3, 717.5))
 barplot(single.models$resdev, names.arg = single.models$pred, xlab="Predictor", ylab="Residual devaince", main="Single variable predictors", col="lightcoral")
+
+# Two-variable models
+model2.thickness <- glm(Verdict~SizeUniformity+Thickness, family="binomial", data=biopsy)
+summary(model2.thickness) # ResDev 196.6
+model2.shape <- glm(Verdict~SizeUniformity+ShapeUniformity, family="binomial", data=biopsy)
+summary(model2.shape) # ResDev 221.1
+model2.adhesion <- glm(Verdict~SizeUniformity+Adhesion, family="binomial", data=biopsy)
+summary(model2.adhesion) # ResDev 229.0
+model2.cellsize <- glm(Verdict~SizeUniformity+CellSize, family="binomial", data=biopsy)
+summary(model2.cellsize) # ResDev 239.5
+model2.nuclei <- glm(Verdict~SizeUniformity+Nuclei, family="binomial", data=biopsy)
+summary(model2.nuclei) # ResDev 166.3
+model2.chromatin <- glm(Verdict~SizeUniformity+Chromatin, family="binomial", data=biopsy)
+summary(model2.chromatin) # ResDev 207.3
+model2.nucleoli <- glm(Verdict~SizeUniformity+Nucleoli, family="binomial", data=biopsy)
+summary(model2.nucleoli) # ResDev 223.0
+model2.mitoses <- glm(Verdict~SizeUniformity+Mitoses, family="binomial", data=biopsy)
+summary(model2.mitoses) # ResDev 241.4
+
+double.models <- data.frame(pred2=c("Thickness", "ShapeUniformity", "Adhesion", "CellSize", "Nuclei", "Chromatin", "Nucleoli", "Mitoses"), resdev=c(196.6, 221.1, 229.0, 239.5, 166.3, 207.3, 223.0, 241.4))
+barplot(double.models$resdev, names.arg=double.models$pred2, xlab="Second predictor", ylab="Residual deviance", main="Second predictors", col="olivedrab2")
+
+model3.thickness <- glm(Verdict~SizeUniformity+Nuclei+Thickness, family="binomial", data=biopsy)
+summary(model3.thickness) # ResDev 135.6
+model3.shape <- glm(Verdict~SizeUniformity+Nuclei+ShapeUniformity, family="binomial", data=biopsy)
+summary(model3.shape) # ResDev 153.1
+model3.adhesion <- glm(Verdict~SizeUniformity+Nuclei+Adhesion, family="binomial", data=biopsy)
+summary(model3.adhesion) # ResDev 161.0
+model3.cellsize <- glm(Verdict~SizeUniformity+Nuclei+CellSize, family="binomial", data=biopsy)
+summary(model3.cellsize) # ResDev 161.6
+model3.chromatin <- glm(Verdict~SizeUniformity+Nuclei+Chromatin, family="binomial", data=biopsy)
+summary(model3.chromatin) # ResDev 151.8
+model3.nucleoli <- glm(Verdict~SizeUniformity+Nuclei+Nucleoli, family="binomial", data=biopsy)
+summary(model3.nucleoli) # ResDev 150.9
+model3.mitoses <- glm(Verdict~SizeUniformity+Nuclei+Mitoses, family="binomial", data=biopsy)
+summary(model3.mitoses) # ResDev 158.5
+
+triple.models <- data.frame(pred3=c("Thickness", "ShapeUniformity", "Adhesion", "CellSize", "Chromatin", "Nucleoli", "Mitoses"), resdev=c(135.6, 153.1, 161.0, 161.6, 151.8, 150.9, 158.5))
+barplot(triple.models$resdev, names.arg=triple.models$pred3, xlab="Third predictor", ylab="Residual deviance", main="Third predictors", col="royalblue1")
+
+model4.shape <- glm(Verdict~SizeUniformity+Nuclei+Thickness+ShapeUniformity, family="binomial", data=biopsy)
+summary(model4.shape) # ResDev 129.5
+model4.adhesion <- glm(Verdict~SizeUniformity+Nuclei+Thickness+Adhesion, family="binomial", data=biopsy)
+summary(model4.adhesion) # ResDev 126.3
+model4.cellsize <- glm(Verdict~SizeUniformity+Nuclei+Thickness+CellSize, family="binomial", data=biopsy)
+summary(model4.cellsize) # ResDev 131.5
+model4.chromatin <- glm(Verdict~SizeUniformity+Nuclei+Thickness+Chromatin, family="binomial", data=biopsy)
+summary(model4.chromatin) # ResDev 123.3
+model4.nucleoli <- glm(Verdict~SizeUniformity+Nuclei+Thickness+Nucleoli, family="binomial", data=biopsy)
+summary(model4.nucleoli) # ResDev 123.8
+model4.mitoses <- glm(Verdict~SizeUniformity+Nuclei+Thickness+Mitoses, family="binomial", data=biopsy)
+summary(model4.mitoses) # ResDev 133.0
+
+quad.models <- data.frame(pred4 = c("ShapeUniformity", "Adhesion", "CellSize", "Chromatin", "Nucleoli", "Mitoses"), resdev=c(129.5, 126.3, 131.5, 123.3, 123.8, 133.0))
+barplot(quad.models$resdev, names.arg=quad.models$pred4, xlab="Fourth predictor", ylab="Residual devaince", main="Fourth predictors", col="goldenrod1")
 
 # Manual build up
 model1 = glm(Verdict~Thickness,family="binomial",data=biopsy)
