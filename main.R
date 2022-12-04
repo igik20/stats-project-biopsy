@@ -70,6 +70,28 @@ for(pred in names(biopsy)[2:6]){
   deltas %>% add_row(predictor = pred, delta = delta)
 }
 
+# Single predictor models
+model.thickness <- glm(Verdict~Thickness, family="binomial", data=biopsy)
+summary(model.thickness) # ResDev 458.5
+model.sizeunif <- glm(Verdict~SizeUniformity, family="binomial", data=biopsy)
+summary(model.sizeunif) # ResDev 254.8
+model.shape <- glm(Verdict~ShapeUniformity, family="binomial", data=biopsy)
+summary(model.shape) # ResDev 267.6
+model.adhesion <- glm(Verdict~Adhesion, family="binomial", data=biopsy)
+summary(model.adhesion) # ResDev 463.3
+model.cellsize <- glm(Verdict~CellSize, family="binomial", data=biopsy)
+summary(model.cellsize) # ResDev 452.9
+model.nuclei <- glm(Verdict~Nuclei, family="binomial", data=biopsy)
+summary(model.nuclei) # ResDev 340.6
+model.chromatin <- glm(Verdict~Chromatin, family="binomial", data=biopsy)
+summary(model.chromatin) # ResDev 388.2
+model.nucleoli <- glm(Verdict~Nucleoli, family="binomial", data=biopsy)
+summary(model.nucleoli) # ResDev 464.3
+model.mitoses <- glm(Verdict~Mitoses, family="binomial", data=biopsy)
+summary(model.mitoses) # ResDev 717.52
+
+single.models <- data.frame(pred=names(biopsy)[2:10],resdev=c(458.5, 254.8, 267.6, 463.3, 452.9, 340.6, 388.2, 464.3, 717.52))
+barplot(single.models$resdev, names.arg = single.models$pred, xlab="Predictor", ylab="Residual devaince", main="Single variable predictors", col="lightcoral")
 
 # Manual build up
 model1 = glm(Verdict~Thickness,family="binomial",data=biopsy)
