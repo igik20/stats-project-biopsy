@@ -18,13 +18,15 @@ names(biopsy) <- c("ID", "Thickness", "SizeUniformity", "ShapeUniformity", "Adhe
 biopsy$Verdict[biopsy$Verdict == "benign"] <- 0
 biopsy$Verdict[biopsy$Verdict == "malignant"] <- 1
 biopsy$Verdict <- as.numeric(biopsy$Verdict)
-biopsy=drop_na(biopsy)
-
-
-
+biopsy <- drop_na(biopsy)
 
 # Exploratory plots
 plot(biopsy[,2:10])
+boxplot(biopsy[,2:10])
+for(var in names(biopsy)[2:10])
+{
+  hist(biopsy[,var], main=var, col="skyblue")
+}
 
 # Predictor correlation analysis
 attach(biopsy)
@@ -39,36 +41,10 @@ plot(jitter(biopsy$Thickness), jitter(biopsy$Verdict), col=c('#8eca74', '#ffc23f
 legend("topleft", legend=c("benign", "malignant"),
        col=c("#8eca74", "#ffc23f"), pch=1, cex=0.8)
 
-
-
-
 model.thickness <- glm(Verdict~Thickness, data=biopsy, family=binomial(link="logit"))
 summary(model.thickness)
 plot(model.thickness)
 curve(predict(model.thickness, data.frame(Thickness = x), type="resp"), add=T, col="chocolate1", lwd=2)
-
-# Function to generate models
-make.model.1 <- function(resp, pred) {
-  model <- glm(resp~pred, family=binomial(link="logit"))
-  nD <- model$null.deviance
-  rD <- model$deviance
-  dD <- (nD - rD)
-  return (model)
-}
-
-
-# Testing the function
-model.sunif <- make.model.1(biopsy$Verdict, biopsy$SizeUniformity)
-summary(model.sunif)
-model.sunif$null.deviance - model.sunif$deviance
-
-deltas <- data.frame("template", 0)
-names(deltas) <- c("predictor", "delta")
-for(pred in names(biopsy)[2:6]){
-  model <- make.model.1(biopsy$Verdict, pred)
-  delta <- model$null.deviance - model$deviance
-  deltas %>% add_row(predictor = pred, delta = delta)
-}
 
 # Single predictor models
 model.thickness <- glm(Verdict~Thickness, family="binomial", data=biopsy)
