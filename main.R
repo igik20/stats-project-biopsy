@@ -1,6 +1,8 @@
 # Biopsy Statistics Project fall 2022
 # by Xavier Crespo and Igor Trujnara
 
+### Key factors for malignancy prediction in breast carcinoma ###
+
 # Packages
 library("ggplot2")
 library("corrplot")
@@ -11,20 +13,19 @@ library("dplyr")
 # Data import
 biopsy <- read.csv("biopsy.csv")
 
-# Set human-readable names
+# Set human-readable names and modifiying the veredict column to be numeric
 biopsy <- biopsy[,-1]
-
 names(biopsy) <- c("ID", "Thickness", "SizeUniformity", "ShapeUniformity", "Adhesion", "CellSize", "Nuclei", "Chromatin", "Nucleoli", "Mitoses", "Verdict")
 biopsy$Verdict[biopsy$Verdict == "benign"] <- 0
 biopsy$Verdict[biopsy$Verdict == "malignant"] <- 1
 biopsy$Verdict <- as.numeric(biopsy$Verdict)
 biopsy <- drop_na(biopsy)
 
+
 # Exploratory plots
 plot(biopsy[,2:10])
 boxplot(biopsy[,2:10])
-for(var in names(biopsy)[2:10])
-{
+for(var in names(biopsy)[2:10]){
   hist(biopsy[,var], main=var, col="skyblue")
 }
 
@@ -124,20 +125,4 @@ summary(model4.mitoses) # ResDev 133.0
 quad.models <- data.frame(pred4 = c("ShapeUniformity", "Adhesion", "CellSize", "Chromatin", "Nucleoli", "Mitoses"), resdev=c(129.5, 126.3, 131.5, 123.3, 123.8, 133.0))
 barplot(quad.models$resdev, names.arg=quad.models$pred4, xlab="Fourth predictor", ylab="Residual devaince", main="Fourth predictors", col="goldenrod1")
 
-# Manual build up
-model1 = glm(Verdict~Thickness,family="binomial",data=biopsy)
-summary(model1)
-model2 = glm(Verdict~Thickness+SizeUniformity,family="binomial",data=biopsy)
-summary(model2)
-model3 = glm(Verdict~Thickness+SizeUniformity+ShapeUniformity,family="binomial",data=biopsy)
-summary(model3)
-model4 = glm(Verdict~Thickness+SizeUniformity*ShapeUniformity,family="binomial",data=biopsy)
-summary(model4)
-model5 = glm(Verdict~.,family="binomial",data=biopsy)
-summary(model5)
-
-coef(model5)
-
-list(model1, model2, model3, model4, model5)
-anova(model1, model2, model3, model4, model5, test = "Chisq")
-# By now, model4 is the best based on deviance as it has the lowest compared to the other models.
+# A copy of the dataset and the source code can be found at https://github.com/igik20/stats-project-biopsy
